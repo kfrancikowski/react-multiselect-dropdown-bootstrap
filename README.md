@@ -1,4 +1,4 @@
-# react-dropdown-multiselect
+# react-multiselect-dropdown-bootstrap
 A React.js component to easy create dropdowns that allows multiple option selection.
 
 # Examples
