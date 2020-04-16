@@ -29,6 +29,7 @@ class SomeSection extends React.Component {
           "Spain",
           "France",
         ]}
+        name="countries"
       ></DropdownMultiselect>
     );
   }
@@ -36,3 +37,19 @@ class SomeSection extends React.Component {
 
 export default SectionTwo;
 ```
+# Available props
+## Props
+
+Required:
+- `options` - an array with available options
+- `name` - a string with the name (just like for normal html inputs)
+Optional:
+- `selected` - an array with options that should be selected as default
+- `handleOnChange` - a callback function to run when selected options will be changed. A "selected" param is available. It contains an array of currently selected options. Example:
+```js
+handleOnChange={(selected) => {
+  props.changeMarket(selected);
+}}
+```
+- `placeholder` - default value is "Nothing selected"
+- `buttonClass` - you can specify a css class for button. Default is "btn-light"
