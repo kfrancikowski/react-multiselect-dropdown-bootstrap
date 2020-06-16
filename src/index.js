@@ -6,14 +6,50 @@ class DropdownMultiselect extends React.Component {
     super(props);
 
     this.state = {
-      options: this.props.options,
       placeholder: this.props.placeholder,
       showDropdown: false,
       selected: this.props.selected,
+      options: [],
     };
   }
 
+  setSelected() {}
+
+  setOptions() {
+    if (this.props.options.length == 0) {
+      console.log("React Dropdown Multiselect Error: options array is empty.");
+      return;
+    }
+
+    if (typeof this.props.options[0] === "object") {
+      this.props.options.map((value, index) => {
+        if (value.key === undefined || value.label === undefined) {
+          console.log(
+            "React Dropdown Multiselect Error: options is not well formatted. Please check documentation."
+          );
+          return;
+        }
+      });
+
+      this.setState({
+        options: this.props.options,
+      });
+    }
+
+    if (typeof this.props.options[0] === "string") {
+      let optionsArray = [];
+      this.props.options.map((value, index) => {
+        optionsArray.push({ key: value, label: value });
+      });
+
+      this.setState({
+        options: optionsArray,
+      });
+    }
+  }
+
   componentDidMount() {
+    this.setOptions();
     document.addEventListener("mousedown", this.handleClickOutside.bind(this));
   }
 
@@ -25,6 +61,21 @@ class DropdownMultiselect extends React.Component {
       this.setState({
         showDropdown: false,
       });
+    }
+  }
+
+  getPlaceholderValue() {
+    if (this.state.selected.length == 0) {
+      return this.props.placeholder;
+    }
+
+    if (
+      this.props.placeholderMultipleChecked !== null &&
+      this.state.selected.length > 1
+    ) {
+      return this.props.placeholderMultipleChecked;
+    } else {
+      return this.state.selected.join(", ");
     }
   }
 
@@ -50,7 +101,7 @@ class DropdownMultiselect extends React.Component {
       var index = currentSelected.indexOf(ev.currentTarget.value);
       currentSelected.splice(index, 1);
     }
-
+    console.log(currentSelected);
     // update the state with the new array of options
     this.setState({ selected: currentSelected });
 
@@ -103,34 +154,36 @@ class DropdownMultiselect extends React.Component {
               marginRight: "-6px",
             }}
           >
-            {this.state.selected.length > 0
-              ? this.state.selected.join(", ")
-              : this.props.placeholder}
+            {this.getPlaceholderValue()}
           </span>
         </button>
         <div className={dropdownClass} style={{ padding: 0, width: "100%" }}>
-          <div className="btn-group btn-group-sm btn-block">
-            <button
-              className="actions-btn btn btn-light"
-              onClick={() => this.handleSelectDeselectAll()}
-            >
-              Select/Deselect All
-            </button>
-          </div>
+          {this.props.showSelectToggle === true && (
+            <div className="btn-group btn-group-sm btn-block">
+              <button
+                className="actions-btn btn btn-light"
+                onClick={() => this.handleSelectDeselectAll()}
+              >
+                Select/Deselect All
+              </button>
+            </div>
+          )}
 
-          {this.props.options.map((value, index) => {
+          {this.state.options.map((option, index) => {
             return (
               <div key={index} className="dropdown-item">
                 <div className="form-check">
                   <input
-                    value={value}
+                    value={option.key}
                     id={`multiselect-${this.props.name}-${index}`}
                     className="form-check-input"
                     type="checkbox"
                     name={`${this.props.name}[]`}
                     onChange={(ev) => this.handleChange(ev)}
                     checked={
-                      this.state.selected.indexOf(value) > -1 ? "checked" : ""
+                      this.state.selected.indexOf(option.key.toString()) > -1
+                        ? "checked"
+                        : ""
                     }
                   />
                   <label
@@ -138,7 +191,7 @@ class DropdownMultiselect extends React.Component {
                     style={{ userSelect: "none", width: "100%" }}
                     htmlFor={`multiselect-${this.props.name}-${index}`}
                   >
-                    {value}
+                    {option.label}
                   </label>
                 </div>
               </div>
@@ -155,14 +208,18 @@ DropdownMultiselect.propTypes = {
   selected: PropTypes.array,
   value: PropTypes.array,
   placeholder: PropTypes.string,
+  placeholderMultipleChecked: PropTypes.string,
   options: PropTypes.array.isRequired,
   name: PropTypes.string.isRequired,
+  showSelectToggle: PropTypes.bool,
 };
 
 DropdownMultiselect.defaultProps = {
   placeholder: "Nothing selected",
   buttonClass: "btn-light",
+  placeholderMultipleChecked: null,
   selected: [],
+  showSelectToggle: true,
 };
 
 export default DropdownMultiselect;

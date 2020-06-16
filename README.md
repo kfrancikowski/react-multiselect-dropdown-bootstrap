@@ -54,3 +54,4 @@ handleOnChange={(selected) => {
 
 - `placeholder` - default value is "Nothing selected"
 - `buttonClass` - you can specify a css class for button. Default is "btn-light"
+- `placeholderMultipleChecked` - you can specify a placeholder that will be used if more than one option is selected at the same time. For example: "Multiple selected"
