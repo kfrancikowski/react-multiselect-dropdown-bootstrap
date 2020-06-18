@@ -43,12 +43,12 @@ import DropdownMultiselect from "react-multiselect-dropdown-bootstrap";
 class SomeSection extends React.Component {
   render() {
     const optionsArray = [
-      { value: "au", label: "Australia" },
-      { value: "ca", label: "Canada" },
-      { value: "us", label: "USA" },
-      { value: "pl", label: "Poland" },
-      { value: "es", label: "Spain" },
-      { value: "fr", label: "France" },
+      { key: "au", label: "Australia" },
+      { key: "ca", label: "Canada" },
+      { key: "us", label: "USA" },
+      { key: "pl", label: "Poland" },
+      { key: "es", label: "Spain" },
+      { key: "fr", label: "France" },
     ];
 
     return <DropdownMultiselect options={optionsArray} name="countries" />;
@@ -62,7 +62,7 @@ export default SomeSection;
 
 ## Required
 
-- `options` - an array with available options. You can use a simple array like ["Spain", "Italy"] or array of objects like [{value: "es", label: "Spain"}, {value: "it", label: "Italy"}] to set a different values to select than labels that will be shown in a dropdown.
+- `options` - an array with available options. You can use a simple array like ["Spain", "Italy"] or array of objects like [{key: "es", label: "Spain"}, {key: "it", label: "Italy"}] to set a different values to select than labels that will be shown in a dropdown.
 - `name` - a string with the name (just like for normal html inputs)
 
 ## Optional
