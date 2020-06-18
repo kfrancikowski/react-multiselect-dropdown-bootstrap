@@ -5,11 +5,14 @@ const options = [
   { value: 1, label: "Potatoes" },
   { value: 2, label: "Apples" },
   { value: 3, label: "Bananas" },
-  { value: 4, label: "Poland" },
+  { value: 4, label: "Mango" },
 ];
+
+const optionsSimple = ["Potatoes", "Apples", "Bananas", "Mango"];
 
 const Demo = () => (
   <>
     <DropdownMultiselect options={options} />
+    <DropdownMultiselect options={optionsSimple} />
   </>
 );

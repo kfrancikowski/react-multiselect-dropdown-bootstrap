@@ -101,7 +101,7 @@ class DropdownMultiselect extends React.Component {
       var index = currentSelected.indexOf(ev.currentTarget.value);
       currentSelected.splice(index, 1);
     }
-    console.log(currentSelected);
+
     // update the state with the new array of options
     this.setState({ selected: currentSelected });
 
@@ -118,10 +118,17 @@ class DropdownMultiselect extends React.Component {
         : null;
     } else {
       let allOptions = this.state.options;
-      this.setState({ selected: allOptions });
+
+      let newSelected = [];
+
+      allOptions.map((obj) => {
+        newSelected.push(obj.key.toString());
+      });
+
+      this.setState({ selected: newSelected });
 
       this.props.handleOnChange !== undefined
-        ? this.props.handleOnChange(allOptions)
+        ? this.props.handleOnChange(newSelected)
         : null;
     }
   }
