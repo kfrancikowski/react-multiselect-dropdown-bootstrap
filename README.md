@@ -31,14 +31,38 @@ class SomeSection extends React.Component {
   }
 }
 
-export default SectionTwo;
+export default SomeSection;
+```
+
+You can also use an options with different values than labels. Please check an example below:
+
+```js
+import React from "react";
+import DropdownMultiselect from "react-multiselect-dropdown-bootstrap";
+
+class SomeSection extends React.Component {
+  render() {
+    const optionsArray = [
+      { value: "au", label: "Australia" },
+      { value: "ca", label: "Canada" },
+      { value: "us", label: "USA" },
+      { value: "pl", label: "Poland" },
+      { value: "es", label: "Spain" },
+      { value: "fr", label: "France" },
+    ];
+
+    return <DropdownMultiselect options={optionsArray} name="countries" />;
+  }
+}
+
+export default SomeSection;
 ```
 
 # Available props
 
 ## Required
 
-- `options` - an array with available options
+- `options` - an array with available options. You can use a simple array like ["Spain", "Italy"] or array of objects like [{value: "es", label: "Spain"}, {value: "it", label: "Italy"}] to set a different values to select than labels that will be shown in a dropdown.
 - `name` - a string with the name (just like for normal html inputs)
 
 ## Optional
