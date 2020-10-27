@@ -1,5 +1,5 @@
-import React from "react";
 import PropTypes from "prop-types";
+import React from "react";
 
 class DropdownMultiselect extends React.Component {
   constructor(props) {
@@ -10,6 +10,8 @@ class DropdownMultiselect extends React.Component {
       showDropdown: false,
       selected: this.props.selected,
       options: [],
+      optionLabel: this.props.optionLabel,
+      optionKey: this.props.optionKey
     };
   }
 
@@ -22,17 +24,22 @@ class DropdownMultiselect extends React.Component {
     }
 
     if (typeof this.props.options[0] === "object") {
+      let optionsArray = [];
       this.props.options.map((value, index) => {
-        if (value.key === undefined || value.label === undefined) {
-          console.log(
-            "React Dropdown Multiselect Error: options is not well formatted. Please check documentation."
-          );
-          return;
+        let key = value;
+        if (this.props.getOptionKey !== null) {
+          key = this.props.getOptionKey(value);
         }
+
+        let label = value;
+        if (this.props.getOptionLabel !== null) {
+          label = this.props.getOptionLabel(value);
+        }
+        optionsArray.push({ key: key, label: label });
       });
 
       this.setState({
-        options: this.props.options,
+        options: optionsArray,
       });
     }
 
@@ -219,6 +226,8 @@ DropdownMultiselect.propTypes = {
   options: PropTypes.array.isRequired,
   name: PropTypes.string.isRequired,
   showSelectToggle: PropTypes.bool,
+  getOptionKey: PropTypes.string,
+  getOptionLabel: PropTypes.string,
 };
 
 DropdownMultiselect.defaultProps = {
@@ -227,6 +236,8 @@ DropdownMultiselect.defaultProps = {
   placeholderMultipleChecked: null,
   selected: [],
   showSelectToggle: true,
+  getOptionKey: null,
+  getOptionLabel: null,
 };
 
 export default DropdownMultiselect;
