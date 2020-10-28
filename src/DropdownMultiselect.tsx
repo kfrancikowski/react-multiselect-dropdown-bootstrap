@@ -1,41 +1,40 @@
 import * as React from 'react';
-import { ChangeEvent } from 'react';
+import { Option } from './index';
+import { DropdownMultiselectToggleBtn } from './DropdownMultiselectToggleBtn';
+import { DropdownMultiselectSelection } from './DropdownMultiselectSelection';
+import { DropdownMultiselectOption } from './DropdownMultiselectOption';
 
 interface IState {
-  placeholder?: string;
   showDropdown: boolean;
-  selected?: any;
   options: Option[];
-}
-
-interface Option {
-  key: string;
-  label: string;
+  selected: Option[];
 }
 
 interface IProps {
   name: string;
-  options: any;
-  handleOnChange?: any;
+  options: Option[] | any;
+  isMultiSelectable: boolean;
   placeholder?: string;
-  placeholderMultipleChecked?: string;
+  title?: string;
+  placeholderSelect?: string;
+  placeholderDeselect?: string;
   buttonClass?: string;
   selected?: any;
   value?: any;
-  showSelectToggle?: boolean;
+  onChange?: any;
   getOptionKey?: (value: string) => string;
   getOptionLabel?: (value: string) => string;
 }
 
 class DropdownMultiselectComponent extends React.Component<IProps, IState> {
   private node: HTMLDivElement | null | undefined;
+
   constructor(props: IProps) {
     super(props);
-
+    const { selected } = this.props;
     this.state = {
-      placeholder: this.props.placeholder,
       showDropdown: false,
-      selected: this.props.selected,
+      selected: selected ? selected : [],
       options: [],
     };
   }
@@ -50,115 +49,84 @@ class DropdownMultiselectComponent extends React.Component<IProps, IState> {
   }
 
   render(): JSX.Element {
-    const dropdownClass = this.state.showDropdown ? 'dropdown-menu show' : 'dropdown-menu';
-
+    const {
+      isMultiSelectable,
+      buttonClass,
+      placeholder,
+      title,
+      placeholderSelect,
+      placeholderDeselect,
+      name,
+      onChange,
+    } = this.props;
+    const { showDropdown, options, selected } = this.state;
     return (
       <div className="dropdown" ref={(node) => (this.node = node)}>
-        <button
-          className={`btn dropdown-toggle ${this.props.buttonClass}`}
-          type="button"
-          data-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false"
-          onClick={this.handleClick}
-          style={{
-            width: '100%',
-            overflow: 'hidden',
-          }}
-        >
-          <span
-            style={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              width: '100%',
-              float: 'left',
-              textAlign: 'left',
-              paddingRight: '6px',
-              marginRight: '-6px',
-            }}
-          >
-            {this.getPlaceholderValue()}
-          </span>
-        </button>
-        <div className={dropdownClass} style={{ padding: 0, width: '100%' }}>
-          {this.props.showSelectToggle === true && (
-            <div className="btn-group btn-group-sm btn-block">
-              <button className="actions-btn btn btn-light" onClick={this.handleSelectDeselectAll}>
-                Select/Deselect All
-              </button>
-            </div>
-          )}
-
-          {this.state.options.map((option, index) => {
-            return (
-              <div key={index} className="dropdown-item">
-                <div className="form-check">
-                  <input
-                    value={option.key}
-                    id={`multiselect-${this.props.name}-${index}`}
-                    className="form-check-input"
-                    type="checkbox"
-                    name={`${this.props.name}[]`}
-                    onChange={this.handleChange}
-                    checked={this.state.selected.indexOf(option.key.toString()) > -1}
-                  />
-                  <label
-                    className="form-check-label"
-                    style={{ userSelect: 'none', width: '100%' }}
-                    htmlFor={`multiselect-${this.props.name}-${index}`}
-                  >
-                    {option.label}
-                  </label>
-                </div>
-              </div>
-            );
-          })}
+        <DropdownMultiselectToggleBtn
+          showDropdown={showDropdown}
+          buttonClass={buttonClass}
+          placeholder={placeholder}
+          selected={selected}
+          title={title}
+        />
+        <div className={showDropdown ? 'dropdown-menu show' : 'dropdown-menu'} style={{ padding: 0, width: '100%' }}>
+          <DropdownMultiselectSelection
+            handleSelect={this.handleSelectAll}
+            handleDeselect={this.handleDeselectAll}
+            isMultiSelectable={isMultiSelectable}
+            placeholderSelect={placeholderSelect}
+            placeholderDeselect={placeholderDeselect}
+          />
+          <DropdownMultiselectOption options={options} selected={selected} name={name} onChange={onChange} />
         </div>
       </div>
     );
   }
 
-  private handleClickOutside = (ev: any): void => {
-    // @ts-ignore
-    if (this.state.showDropdown && this.node.contains(ev.target) === false) {
+  private handleSelectAll = (): void => {
+    const { options, onChange } = this.props;
+    this.setState({ selected: options });
+
+    if (onChange) {
+      onChange(options);
+    }
+  };
+
+  private handleDeselectAll = (): void => {
+    const { onChange } = this.props;
+    this.setState({ selected: [] });
+
+    if (onChange) {
+      onChange([]);
+    }
+  };
+
+  private handleClickOutside = (event: any): void => {
+    if (this.state.showDropdown && this.node?.contains(event.target) === false) {
       this.setState({
         showDropdown: false,
       });
     }
   };
 
-  private getPlaceholderValue = (): string => {
-    if (this.state.selected.length === 0) {
-      // @ts-ignore
-      return this.props.placeholder;
-    }
-
-    if (this.props.placeholderMultipleChecked !== null && this.state.selected.length > 1) {
-      // @ts-ignore
-      return this.props.placeholderMultipleChecked;
-    } else {
-      return this.state.selected.join(', ');
-    }
-  };
-
   private setOptions = (): void => {
-    if (this.props.options.length === 0) {
-      // tslint:disable-next-line:no-console
-      console.log('React Dropdown Multiselect Error: options array is empty.');
+    const { options, getOptionKey, getOptionLabel } = this.props;
+
+    if (options.length === 0) {
       return;
     }
 
-    if (typeof this.props.options[0] === 'object') {
+    if (typeof options[0] === 'object') {
       const optionsArray: Option[] = [];
-      this.props.options.map((value: any, index: any) => {
-        let key = value;
-        if (this.props.getOptionKey !== undefined) {
-          key = this.props.getOptionKey(value);
+      options.map((value: Option) => {
+        let key: string = '';
+        if (getOptionKey !== undefined) {
+          key = getOptionKey(value.key);
         }
 
-        let label = value;
-        if (this.props.getOptionLabel !== undefined) {
-          label = this.props.getOptionLabel(value);
+        let label: string = '';
+        if (getOptionLabel !== undefined) {
+          label = getOptionLabel(value.label);
         }
         optionsArray.push({ key, label });
       });
@@ -168,60 +136,15 @@ class DropdownMultiselectComponent extends React.Component<IProps, IState> {
       });
     }
 
-    if (typeof this.props.options[0] === 'string') {
+    if (typeof options[0] === 'string') {
       const optionsArray: Option[] = [];
-      this.props.options.map((value: any, index: any) => {
+      options.map((value: any) => {
         optionsArray.push({ key: value, label: value });
       });
 
       this.setState({
         options: optionsArray,
       });
-    }
-  };
-
-  private handleClick = (): void => {
-    this.setState({
-      showDropdown: !this.state.showDropdown,
-    });
-  };
-
-  private handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const currentSelected: any = [...this.state.selected];
-
-    if (event.currentTarget.checked) {
-      currentSelected.push(event.currentTarget.value);
-    } else {
-      const index = currentSelected.indexOf(event.currentTarget.value);
-      currentSelected.splice(index, 1);
-    }
-
-    // update the state with the new array of options
-    this.setState({ selected: currentSelected });
-
-    // tslint:disable-next-line:no-unused-expression
-    this.props.handleOnChange !== undefined ? this.props.handleOnChange(currentSelected) : null;
-  };
-
-  private handleSelectDeselectAll = (): void => {
-    if (this.state.selected.length === this.state.options.length) {
-      this.setState({ selected: [] });
-
-      // tslint:disable-next-line:no-unused-expression
-      this.props.handleOnChange !== undefined ? this.props.handleOnChange([]) : null;
-    } else {
-      const allOptions: Option[] = this.state.options;
-
-      const newSelected: Option[] = [];
-
-      allOptions.map((obj) => {
-        newSelected.push(obj);
-      });
-
-      this.setState({ selected: newSelected });
-
-      // tslint:disable-next-line:no-unused-expression
-      this.props.handleOnChange !== undefined ? this.props.handleOnChange(newSelected) : null;
     }
   };
 }
