@@ -10,8 +10,6 @@ class DropdownMultiselect extends React.Component {
       showDropdown: false,
       selected: this.props.selected,
       options: [],
-      optionLabel: this.props.optionLabel,
-      optionKey: this.props.optionKey
     };
   }
 
