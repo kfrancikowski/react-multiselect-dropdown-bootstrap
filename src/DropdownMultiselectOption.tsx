@@ -57,7 +57,7 @@ class DropdownMultiselectOptionComponent<T> extends React.Component<IProps<T>> {
     if (event.currentTarget.checked) {
       currentSelected.push(option);
     } else {
-      const index = currentSelected.indexOf(option);
+      const index = currentSelected.findIndex(opt => this.getKey(opt) === this.getKey(option));
       currentSelected.splice(index, 1);
     }
 
