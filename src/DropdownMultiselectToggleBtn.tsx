@@ -20,7 +20,7 @@ class DropdownMultiselectToggleBtnComponent<T> extends React.Component<IProps<T>
     const title = this.getTitle();
     return (
       <button
-        className={`btn dropdown-toggle ${buttonClass}`}
+        className={`btn btn-light dropdown-toggle ${buttonClass}`}
         type="button"
         data-toggle="dropdown"
         aria-haspopup="true"
