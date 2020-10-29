@@ -1,64 +1,99 @@
 import * as React from 'react';
 import { ChangeEvent } from 'react';
-import { Option } from './index';
 
-interface IProps {
-  name: string;
-  onChange?: any;
-  options: Option[];
-  selected: Option[];
+interface Option {
+  key: string;
+  label: string;
 }
 
-class DropdownMultiselectOptionComponent extends React.Component<IProps> {
+interface IProps<T> {
+  name: string;
+  onChange?: (value: (Option | T | string)[]) => void;
+  setSelected: (selected: (Option | T | string)[]) => void;
+  options: (Option | T | string)[];
+  selected: (Option | T | string)[];
+  getOptionKey?: (value: Option | T | string) => string;
+  getOptionLabel?: (value: Option | T | string) => string;
+}
+
+class DropdownMultiselectOptionComponent<T> extends React.Component<IProps<T>> {
   render(): JSX.Element {
-    const { options, selected, name } = this.props;
+    const { options, name, selected } = this.props;
     return (
       <>
-        {options.map((option, index) => {
-          return (
-            <div key={index} className="dropdown-item">
-              <div className="form-check">
-                <input
-                  value={option.key}
-                  id={`multiselect-${name}-${index}`}
-                  className="form-check-input"
-                  type="checkbox"
-                  name={`${name}[]`}
-                  onChange={this.handleChange}
-                  checked={selected.find((select) => select.key === option.key) !== undefined}
-                />
-                <label
-                  className="form-check-label"
-                  style={{ userSelect: 'none', width: '100%' }}
-                  htmlFor={`multiselect-${name}-${index}`}
-                >
-                  {option.label}
-                </label>
+        {options &&
+          (options as (Option | T | string)[]).map((option: Option | T | string, index: number) => {
+            return (
+              <div key={index} className="dropdown-item">
+                <div className="form-check">
+                  <input
+                    value={this.getKey(option)}
+                    id={`multiselect-${name}-${index}`}
+                    className="form-check-input"
+                    type="checkbox"
+                    name={`${name}`}
+                    onChange={(event) => this.handleChange(event, option)}
+                    checked={selected.indexOf(option) > -1}
+                  />
+                  <label
+                    className="form-check-label"
+                    style={{ userSelect: 'none', width: '100%' }}
+                    htmlFor={`multiselect-${name}-${index}`}
+                  >
+                    {this.getValue(option)}
+                  </label>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </>
     );
   }
 
-  private handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const { selected, onChange } = this.props;
-    const currentSelected: any = [...selected];
+  private handleChange = (event: ChangeEvent<HTMLInputElement>, option: any): void => {
+    const { onChange, selected, setSelected } = this.props;
+    const currentSelected = [...selected];
 
     if (event.currentTarget.checked) {
-      currentSelected.push(event.currentTarget.value);
+      currentSelected.push(option);
     } else {
-      const index = currentSelected.indexOf(event.currentTarget.value);
+      const index = currentSelected.indexOf(option);
       currentSelected.splice(index, 1);
     }
 
-    // update the state with the new array of options
-    this.setState({ selected: currentSelected });
+    setSelected(currentSelected);
 
     if (onChange !== undefined) {
       onChange(currentSelected);
     }
+  };
+
+  private getKey = (value: Option | T | string): string => {
+    const { getOptionKey } = this.props;
+
+    if (getOptionKey) {
+      return getOptionKey(value);
+    }
+
+    if (typeof value === 'string') {
+      return value as string;
+    }
+
+    return (value as Option).key ? (value as Option).key : '';
+  };
+
+  private getValue = (value: Option | T | string): string => {
+    const { getOptionKey } = this.props;
+
+    if (getOptionKey) {
+      return getOptionKey(value);
+    }
+
+    if (typeof value === 'string') {
+      return value as string;
+    }
+
+    return (value as Option).label ? (value as Option).label : '';
   };
 }
 

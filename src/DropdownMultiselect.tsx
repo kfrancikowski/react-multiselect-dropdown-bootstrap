@@ -1,46 +1,48 @@
 import * as React from 'react';
-import { Option } from './index';
 import { DropdownMultiselectToggleBtn } from './DropdownMultiselectToggleBtn';
 import { DropdownMultiselectSelection } from './DropdownMultiselectSelection';
 import { DropdownMultiselectOption } from './DropdownMultiselectOption';
 
-interface IState {
-  showDropdown: boolean;
-  options: Option[];
-  selected: Option[];
+interface Option {
+  key: string;
+  label: string;
 }
 
-interface IProps {
-  name: string;
-  options: Option[] | any;
+interface IState<T> {
+  showDropdown: boolean;
+  selected: (Option | T | string)[];
   isMultiSelectable: boolean;
+}
+
+interface IProps<T> {
+  name: string;
+  options: (Option | T | string)[];
+  selected?: (Option | T | string)[];
+  isMultiSelectable?: boolean;
   placeholder?: string;
   title?: string;
   placeholderSelect?: string;
   placeholderDeselect?: string;
   buttonClass?: string;
-  selected?: any;
-  value?: any;
-  onChange?: any;
-  getOptionKey?: (value: string) => string;
-  getOptionLabel?: (value: string) => string;
+  onChange?: (value: (Option | T | string)[]) => void;
+  getOptionKey?: (value: Option | T | string) => string;
+  getOptionLabel?: (value: Option | T | string) => string;
 }
 
-class DropdownMultiselectComponent extends React.Component<IProps, IState> {
+class DropdownMultiselectComponent<T> extends React.Component<IProps<T>, IState<T>> {
   private node: HTMLDivElement | null | undefined;
 
-  constructor(props: IProps) {
+  constructor(props: IProps<T>) {
     super(props);
-    const { selected } = this.props;
+    const { selected, isMultiSelectable } = this.props;
     this.state = {
       showDropdown: false,
       selected: selected ? selected : [],
-      options: [],
+      isMultiSelectable: isMultiSelectable ? isMultiSelectable : false,
     };
   }
 
   public componentDidMount(): void {
-    this.setOptions();
     document.addEventListener('mousedown', this.handleClickOutside.bind(this));
   }
 
@@ -50,7 +52,6 @@ class DropdownMultiselectComponent extends React.Component<IProps, IState> {
 
   render(): JSX.Element {
     const {
-      isMultiSelectable,
       buttonClass,
       placeholder,
       title,
@@ -58,11 +59,15 @@ class DropdownMultiselectComponent extends React.Component<IProps, IState> {
       placeholderDeselect,
       name,
       onChange,
+      getOptionLabel,
+      getOptionKey,
+      options,
     } = this.props;
-    const { showDropdown, options, selected } = this.state;
+    const { showDropdown, selected, isMultiSelectable } = this.state;
     return (
       <div className="dropdown" ref={(node) => (this.node = node)}>
         <DropdownMultiselectToggleBtn
+          onClick={this.onClick}
           showDropdown={showDropdown}
           buttonClass={buttonClass}
           placeholder={placeholder}
@@ -77,15 +82,33 @@ class DropdownMultiselectComponent extends React.Component<IProps, IState> {
             placeholderSelect={placeholderSelect}
             placeholderDeselect={placeholderDeselect}
           />
-          <DropdownMultiselectOption options={options} selected={selected} name={name} onChange={onChange} />
+          <DropdownMultiselectOption
+            setSelected={(value: (Option | T | string)[]) => this.setState({ selected: value })}
+            options={options}
+            selected={selected}
+            name={name}
+            onChange={onChange}
+            getOptionKey={getOptionKey}
+            getOptionLabel={getOptionLabel}
+          />
         </div>
       </div>
     );
   }
 
+  private onClick = (): void => {
+    const { showDropdown } = this.state;
+    this.setState({
+      showDropdown: !showDropdown,
+    });
+  };
+
   private handleSelectAll = (): void => {
     const { options, onChange } = this.props;
-    this.setState({ selected: options });
+
+    const selected = [...options];
+
+    this.setState({ selected });
 
     if (onChange) {
       onChange(options);
@@ -94,6 +117,7 @@ class DropdownMultiselectComponent extends React.Component<IProps, IState> {
 
   private handleDeselectAll = (): void => {
     const { onChange } = this.props;
+
     this.setState({ selected: [] });
 
     if (onChange) {
@@ -105,45 +129,6 @@ class DropdownMultiselectComponent extends React.Component<IProps, IState> {
     if (this.state.showDropdown && this.node?.contains(event.target) === false) {
       this.setState({
         showDropdown: false,
-      });
-    }
-  };
-
-  private setOptions = (): void => {
-    const { options, getOptionKey, getOptionLabel } = this.props;
-
-    if (options.length === 0) {
-      return;
-    }
-
-    if (typeof options[0] === 'object') {
-      const optionsArray: Option[] = [];
-      options.map((value: Option) => {
-        let key: string = '';
-        if (getOptionKey !== undefined) {
-          key = getOptionKey(value.key);
-        }
-
-        let label: string = '';
-        if (getOptionLabel !== undefined) {
-          label = getOptionLabel(value.label);
-        }
-        optionsArray.push({ key, label });
-      });
-
-      this.setState({
-        options: optionsArray,
-      });
-    }
-
-    if (typeof options[0] === 'string') {
-      const optionsArray: Option[] = [];
-      options.map((value: any) => {
-        optionsArray.push({ key: value, label: value });
-      });
-
-      this.setState({
-        options: optionsArray,
       });
     }
   };

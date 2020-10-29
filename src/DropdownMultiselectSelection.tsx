@@ -1,9 +1,9 @@
 import * as React from 'react';
 
 interface IProps {
-  isMultiSelectable: boolean
-  placeholderSelect?: string
-  placeholderDeselect?: string
+  isMultiSelectable: boolean;
+  placeholderSelect?: string;
+  placeholderDeselect?: string;
   handleSelect: () => void;
   handleDeselect: () => void;
 }
