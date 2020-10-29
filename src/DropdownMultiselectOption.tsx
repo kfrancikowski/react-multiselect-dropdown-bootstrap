@@ -33,7 +33,7 @@ class DropdownMultiselectOptionComponent<T> extends React.Component<IProps<T>> {
                     type="checkbox"
                     name={`${name}`}
                     onChange={(event) => this.handleChange(event, option)}
-                    checked={selected.indexOf(option) > -1}
+                    checked={selected.findIndex(opt => this.getKey(opt) === this.getKey(option)) > -1}
                   />
                   <label
                     className="form-check-label"
