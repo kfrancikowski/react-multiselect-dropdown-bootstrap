@@ -12,7 +12,7 @@ const optionsSimple = ["Potatoes", "Apples", "Bananas", "Mango"];
 
 const Demo = () => (
   <>
-    <DropdownMultiselect options={options} />
-    <DropdownMultiselect options={optionsSimple} />
+    <DropdownMultiselect options={options} name="example1" />
+    <DropdownMultiselect options={optionsSimple} name="example2" />
   </>
 );

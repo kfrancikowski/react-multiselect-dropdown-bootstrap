@@ -75,7 +75,18 @@ class DropdownMultiselect extends React.Component {
     ) {
       return this.props.placeholderMultipleChecked;
     } else {
-      return this.state.selected.join(", ");
+      let currentOptions = [...this.state.options];
+      let selectedLabels = [];
+
+      this.state.selected.map((row) => {
+        let foundOption = currentOptions.find((option) => {
+          return option.key == row;
+        });
+
+        selectedLabels.push(foundOption.label);
+      });
+
+      return selectedLabels.join(", ");
     }
   }
 
