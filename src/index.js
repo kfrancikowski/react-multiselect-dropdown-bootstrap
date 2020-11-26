@@ -21,31 +21,23 @@ class DropdownMultiselect extends React.Component {
       return;
     }
 
+    let optionsArray = [];
     if (typeof this.props.options[0] === "object") {
       this.props.options.map((value, index) => {
-        if (value.key === undefined || value.label === undefined) {
-          console.log(
-            "React Dropdown Multiselect Error: options is not well formatted. Please check documentation."
-          );
-          return;
-        }
-      });
+        let key = value[this.props.optionKey];
+        let label = value[this.props.optionLabel];
 
-      this.setState({
-        options: this.props.options,
+        optionsArray.push({ key: key, label: label });
       });
-    }
-
-    if (typeof this.props.options[0] === "string") {
-      let optionsArray = [];
-      this.props.options.map((value, index) => {
+    } else if (typeof this.props.options[0] === "string") {
+      this.props.options.map((value) => {
         optionsArray.push({ key: value, label: value });
       });
-
-      this.setState({
-        options: optionsArray,
-      });
     }
+
+    this.setState({
+      options: optionsArray,
+    });
   }
 
   componentDidMount() {
@@ -230,6 +222,8 @@ DropdownMultiselect.propTypes = {
   options: PropTypes.array.isRequired,
   name: PropTypes.string.isRequired,
   showSelectToggle: PropTypes.bool,
+  optionKey: PropTypes.string,
+  optionLabel: PropTypes.string,
 };
 
 DropdownMultiselect.defaultProps = {
@@ -238,6 +232,8 @@ DropdownMultiselect.defaultProps = {
   placeholderMultipleChecked: null,
   selected: [],
   showSelectToggle: true,
+  optionKey: 'key',
+  optionLabel: 'label',
 };
 
 export default DropdownMultiselect;
