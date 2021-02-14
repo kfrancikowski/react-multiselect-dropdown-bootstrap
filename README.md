@@ -81,3 +81,4 @@ handleOnChange={(selected) => {
 - `placeholderMultipleChecked` - you can specify a placeholder that will be used if more than one option is selected at the same time. For example: "Multiple selected"
 - `optionKey` - specify custom key property of object. Default is "key"
 - `optionLabel` - specify custom label property of object. Default is "label"
+- `selectDeselectLabel` - specify custom label to use in select/deselect all button. Default is "Select/Deselect All"

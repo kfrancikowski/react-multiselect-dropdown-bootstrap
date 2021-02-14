@@ -78,7 +78,7 @@ class DropdownMultiselect extends React.Component {
       
       this.state.selected.map((row) => {
         let foundOption = currentOptions.find((option) => {
-          return option[optionKey] == row;
+          return option['key'] == row;
         });
 
         selectedLabels.push(foundOption.label);
@@ -102,12 +102,17 @@ class DropdownMultiselect extends React.Component {
   }
 
   handleChange(ev) {
+    if(ev.currentTarget === undefined) {
+      return;
+    }
+    
     var currentSelected = [...this.state.selected];
-
+    let value = ev.currentTarget.value;
+    
     if (ev.currentTarget.checked) {
-      currentSelected.push(ev.currentTarget.value);
+      currentSelected.push(value);
     } else {
-      var index = currentSelected.indexOf(ev.currentTarget.value);
+      var index = currentSelected.indexOf(value);
       currentSelected.splice(index, 1);
     }
 
@@ -118,6 +123,7 @@ class DropdownMultiselect extends React.Component {
       ? this.props.handleOnChange(currentSelected)
       : null;
   }
+
   handleSelectDeselectAll() {
     if (this.state.selected.length == this.state.options.length) {
       this.setState({ selected: [] });
@@ -143,7 +149,8 @@ class DropdownMultiselect extends React.Component {
   }
   render() {
     const dropdownClass =
-      this.state.showDropdown == true ? "dropdown-menu show" : "dropdown-menu";
+
+    this.state.showDropdown == true ? "dropdown-menu show" : "dropdown-menu";
 
     return (
       <div className="dropdown" ref={(node) => (this.node = node)}>
@@ -180,7 +187,7 @@ class DropdownMultiselect extends React.Component {
                 className="actions-btn btn btn-light"
                 onClick={() => this.handleSelectDeselectAll()}
               >
-                Select/Deselect All
+                {this.props.selectDeselectLabel}
               </button>
             </div>
           )}
@@ -224,6 +231,7 @@ DropdownMultiselect.propTypes = {
   selected: PropTypes.array,
   value: PropTypes.array,
   placeholder: PropTypes.string,
+  selectDeselectLabel: PropTypes.string,
   placeholderMultipleChecked: PropTypes.string,
   options: PropTypes.array.isRequired,
   name: PropTypes.string.isRequired,
@@ -234,6 +242,7 @@ DropdownMultiselect.propTypes = {
 
 DropdownMultiselect.defaultProps = {
   placeholder: "Nothing selected",
+  selectDeselectLabel: "Select/Deselect All",
   buttonClass: "btn-light",
   placeholderMultipleChecked: null,
   selected: [],
